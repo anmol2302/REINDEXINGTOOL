@@ -249,9 +249,8 @@ else
   exit 0
 fi
 
-echo ">>STEP4: copying certificates from '$old_index' index to '$new_index' index\n"
+echo ">>STEP4: copying $data_count certificates from '$old_index' index to '$new_index' index\n"
 
-echo "$cert_count records are getting copied to '$new_index' index\n copying data from $old_index to $new_index index"
 
 status_code=$( curl --write-out %{http_code} --silent --output --location --request POST 'http://'$es_ip':9200/_reindex' \
 --header 'Content-Type: application/json' \
@@ -265,7 +264,7 @@ status_code=$( curl --write-out %{http_code} --silent --output --location --requ
 }') 
 
 if [[ $status_code == 200 ]] ; then
-  echo "$cert_count certificates copied from '$old_index' to '$new_index' index with status code 200"
+  echo "$data_count certificates copied from '$old_index' to '$new_index' index with status code 200"
 else
   echo "STEP4 FAILED:to copy certificates with status code $status_code, please manually delete the temp index. exiting the program......"
   exit 0
@@ -352,8 +351,8 @@ curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_search' --head
 ' | jq > certregBackup.txt
 
 
-cert_count=$( curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_count' --header 'Content-Type: application/json' --header 'Accept: text' | jq ."count" )
-read -p "Are you sure you want to continue reindexing of $cert_count records (y/n)?" choice
+data_count=$( curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_count' --header 'Content-Type: application/json' --header 'Accept: text' | jq ."count" )
+read -p "Are you sure you want to continue reindexing of $data_count records (y/n)?" choice
 case "$choice" in
   y|Y ) perform_reindexing;;
   n|N ) echo "no";;
