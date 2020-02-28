@@ -341,7 +341,7 @@ DATE=`date "+%Y%m%d-%H%M%S"`
 backup_file_name=certregBackup$DATE.txt
 echo "PERFORMING '$old_index' BACKUP, can be found in file $backup_file_name"
 
-curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_search' --header 'Content-Type: application/json' --data-raw '{
+curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_search?size=10000' --header 'Content-Type: application/json' --data-raw '{
    "query":{
    
    "match_all":{}
@@ -349,7 +349,7 @@ curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_search' --head
    }
 }
 
-' | jq > $backup_file_name
+' | jq '.' > $backup_file_name
 
 
 data_count=$( curl --location --request GET 'http://'$es_ip':9200/'$old_index'/_count' --header 'Content-Type: application/json' --header 'Accept: text' | jq ."count" )
