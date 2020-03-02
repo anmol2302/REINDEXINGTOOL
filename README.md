@@ -15,19 +15,19 @@ This is the script which will perform reindexing on Elasticsearch Index...
  - mapping_req_filepath: .json file path which will have a request body for creating mappings of new_index.  
  
  
- **NOTE**: old_index will be deleted by the script.
+ **NOTE**: old_index will be deleted by the script. <br>
  
  
  ## Following Steps will be done by Script:
 
   1: Validating Input params
-      - File paths
-      - ElasticSearch health  
-  2: mapping alias_name with `old_index`
-  4: creating indices and mapping of `new_index`.
-  5: Reindexing from `old_index` index to `new_index` index.
-  6: deleting alias with  `old_index` and mapping alias with `new_index`.
-  7: deleting  `old_index`
+      a) File paths
+      b) ElasticSearch health   <br>
+  2: mapping alias_name with `old_index`. <br>
+  4: creating indices and mapping of `new_index`. <br>
+  5: Reindexing from `old_index` index to `new_index` index. <br>
+  6: deleting alias with  `old_index` and mapping alias with `new_index`. <br>
+  7: deleting  `old_index`. <br>
 
 
  
