@@ -117,6 +117,17 @@ if [ "$#" -ne 6 ]; then
     exit 1
 fi
 
+
+
+echo "checking provide file existence"
+
+[ -f "$index_req_filepath" ] || { echo "$index_req_filepath NOT FOUND" ; exit 1 ;}
+[ -f "$mapping_req_filepath" ] || { echo "$mapping_req_filepath NOT FOUND" ; exit 1 ;}
+
+
+
+
+
 echo "ES_IP GOT: $es_ip\n"
 echo "OLD INDEX(NEED TO BE DELETED) GOT: $old_index\n"
 echo "NEW INDEX GOT: $new_index\n"
