@@ -25,53 +25,7 @@ echo ">>STEP2: creating '$new_index' index"
 
 index_status_code=$( curl --write-out %{http_code} --silent --output --location --request PUT 'http://'$es_ip':9200/'$new_index'' \
 --header 'Content-Type: application/json' \
---data-raw '{
-    "settings": {
-        "index": {
-            "number_of_shards": "5",
-            "number_of_replicas": "1",
-            "analysis": {
-                "filter": {
-                    "mynGram": {
-                        "token_chars": [
-                            "letter",
-                            "digit",
-                            "whitespace",
-                            "punctuation",
-                            "symbol"
-                        ],
-                        "min_gram": "1",
-                        "type": "ngram",
-                        "max_gram": "20"
-                    }
-                },
-                "analyzer": {
-                    "cs_index_analyzer": {
-                        "filter": [
-                            "lowercase",
-                            "mynGram"
-                        ],
-                        "type": "custom",
-                        "tokenizer": "standard"
-                    },
-                    "keylower": {
-                        "filter": "lowercase",
-                        "type": "custom",
-                        "tokenizer": "keyword"
-                    },
-                    "cs_search_analyzer": {
-                        "filter": [
-                            "lowercase",
-                            "standard"
-                        ],
-                        "type": "custom",
-                        "tokenizer": "standard"
-                    }
-                }
-            }
-        }
-    }
-}')
+-d @$index_req_filepath)
 
 if [[ $index_status_code == 200 ]] ; then
   echo "'$new_index' index successfully created with status code 200"
@@ -83,164 +37,8 @@ fi
 echo ">>STEP3: creating mapping of '$new_index' index\n"
 
 mapping_status_code=$( curl --write-out %{http_code} --silent --output --location --request PUT 'http://'$es_ip':9200/'$new_index'/_doc/_mapping' \
---header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
---data-raw '{
-
-  "dynamic": "false",
-  "properties": {
-    "accessCode": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    },
-    "createdAt": {
-      "type": "date",
-      "fields": {
-        "raw": {
-          "type": "date"
-        }
-      }
-    },
-    "createdBy": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "analyzer": "keylower",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    },
-    "data": {
-      "type": "object"
-    },
-    "id": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    },
-    "isRevoked": {
-      "type": "boolean",
-      "fields": {
-        "raw": {
-          "type": "boolean"
-        }
-      }
-    },
-    "jsonUrl": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    },
-    "pdfUrl": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    },
-    "reason": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    },
-    "recipient": {
-      "properties": {
-        "id": {
-          "type": "text"
-        },
-        "type": {
-          "type": "text"
-        }
-      }
-    },
-    "related": {
-      "properties": {
-        "type": {
-          "type": "text"
-        }
-      }
-    },
-    "updatedAt": {
-      "type": "date",
-      "fields": {
-        "raw": {
-          "type": "date"
-        }
-      }
-    },
-    "updatedBy": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "text",
-          "fielddata": true
-        }
-      },
-      "copy_to": [
-        "all_fields"
-      ],
-      "analyzer": "cs_index_analyzer",
-      "search_analyzer": "cs_search_analyzer",
-      "fielddata": true
-    }
-  }
-}')
+-d @$mapping_req_filepath)
 
 if [[ $mapping_status_code == 200 ]] ; then
   echo "'$new_index' index mappings successfully created with status code 200"
@@ -311,9 +109,10 @@ es_ip=$1
 old_index=$2
 new_index=$3
 alias_name=$4
+index_req_filepath=$5
+mapping_req_filepath=$6
 
-
-if [ "$#" -ne 4 ]; then
+if [ "$#" -ne 6 ]; then
     echo "PARAM INITIALIZATION FAILED, No command line arguments provided, Please provide esIp, old index, new index and alias name.."
     exit 1
 fi
@@ -322,6 +121,8 @@ echo "ES_IP GOT: $es_ip\n"
 echo "OLD INDEX(NEED TO BE DELETED) GOT: $old_index\n"
 echo "NEW INDEX GOT: $new_index\n"
 echo "Alias GOT: $alias_name\n"
+echo "index json request path got $index_req_filepath"
+echo "mapping request json path $mapping_req_filepath"
 echo "=======Params Initialized==========\n"
 echo "NOTE: IF ANY STEP FAILED PLEASE MANUALLY DELETE THE NEW INDEX from ElasticSearch i.e $new_index."
 
