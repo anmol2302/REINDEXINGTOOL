@@ -23,12 +23,13 @@ This is the script which will perform reindexing on Elasticsearch Index...
   1: Validating Input params
       a) File paths
       b) ElasticSearch health   <br>
-  2: mapping alias_name with `old_index`. <br>
+  2: *Creating Backup file. <br>
+  3: mapping alias_name with `old_index`. <br>
   4: creating indices and mapping of `new_index`. <br>
   5: Reindexing from `old_index` index to `new_index` index. <br>
   6: deleting alias with  `old_index` and mapping alias with `new_index`. <br>
   7: deleting  `old_index`. <br>
 
 
- 
+*BackUp file may not contain all the ES records(due to size limit in ES). <br>
 SOURCE : https://engineering.carsguide.com.au/elasticsearch-zero-downtime-reindexing-e3a53000f0ac
