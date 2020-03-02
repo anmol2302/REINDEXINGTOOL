@@ -113,7 +113,7 @@ index_req_filepath=$5
 mapping_req_filepath=$6
 
 if [ "$#" -ne 6 ]; then
-    echo "PARAM INITIALIZATION FAILED, No command line arguments provided, Please provide esIp, old index, new index and alias name.."
+    echo "PARAM INITIALIZATION FAILED, No command line arguments provided, Please provide esIp, old index, new index and alias name, index_req_filepath, mapping_req_filepath"
     exit 1
 fi
 
